@@ -3,7 +3,7 @@ set -o nounset
 set -o pipefail
 set -e
 
-### This script is for offline e2e
+#### This script is for offline e2e
 HELM_CHART_VERSION=$1
 IMAGE_VERSION=$1
 export SPRAY_JOB_VERSION=$1
@@ -44,6 +44,12 @@ registry_addr_arm64=${RUNNER_NODE_IP}:${REGISTRY_PORT_ARM64}
 local_helm_repo_alias="kubean_release"
 source "${REPO_ROOT}"/hack/util.sh
 source "${REPO_ROOT}"/hack/offline-util.sh
+
+if [[ ${HELM_CHART_VERSION} =~ .*rc ]];then
+  echo "RC version, remain the the kube_version to 1.24.7"
+else
+   sed -i '/kube_version: /d' ${REPO_ROOT}/test/offline-common/vars-conf-cm.yml
+fi
 
 util::clean_offline_kind_cluster
 # add kubean repo locally

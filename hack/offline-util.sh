@@ -17,7 +17,7 @@ function util::clean_offline_kind_cluster() {
 }
 
 ### Restore vm snapshot to only os installed state
-function util::restore_vsphere_vm_snapshot {
+function util::restore_vsphere_vm_snapshot() {
   VSPHERE_HOST=${1}
   VSPHERE_PASSWD=${2}
   VSPHERE_USER=${3}
@@ -28,7 +28,19 @@ function util::restore_vsphere_vm_snapshot {
   # vsphere python package
   if [ ! -d "pyvmomi-community-samples" ]; then
     pip3 install -v pyvmomi==7.0.3
-    git clone https://github.com/vmware/pyvmomi-community-samples.git
+    for ((i=0;i <5; i++)){
+       cloneOk="true"
+       git clone https://github.com/vmware/pyvmomi-community-samples.git  || cloneOk="false"
+       if [ ${cloneOk} == "false" ];then
+          echo "pyvmomi clone failed, try later..."
+          sleep 10
+       else
+         echo "pyvmomi clone ok."
+         break
+       fi
+    }
+
+
   else
     echo "vmware python repo exist"
   fi
@@ -367,10 +379,11 @@ function util::wait_ip_reachable(){
     loop_time=$2
     ATTEMPTS=0
     pingOK=0
-    ping -w 2 -c 1 $vm_ip_addr1|grep "0%" && pingOK=true || pingOK=false
+    echo "Wait vm_ip=$1 reachable ... "
+    ping -w 2 -c 1 ${vm_ip}|grep "0%" && pingOK=true || pingOK=false
     until [ "${pingOK}" == "true" ] || [ $ATTEMPTS -eq $((loop_time)) ]; do
-    ping -w 2 -c 1 $vm_ip_addr1|grep "0%" && pingOK=true || pingOK=false
-    echo "==> ping "$vm_ip_addr1 $pingOK
+    ping -w 2 -c 1 ${vm_ip}|grep "0%" && pingOK=true || pingOK=false
+    echo "==> ping "${vm_ip} $pingOK
     ATTEMPTS=$((ATTEMPTS + 1))
     sleep 10
     done
@@ -388,10 +401,10 @@ function util::delete_kylin_vm(){
     echo "${vm_name} not exist, no delete"
   else
     echo "${vm_name} exist"
-    shutdown_vm_cmd=${sshpass_cmd_prefix}" virsh shutdown ${vm_name}|| echo true"
-    echo "${shutdown_vm_cmd}"
-    eval "${shutdown_vm_cmd}"
-    sleep 2
+    destroy_vm_cmd=${sshpass_cmd_prefix}" virsh destroy ${vm_name}|| echo true"
+    echo "${destroy_vm_cmd}"
+    eval "${destroy_vm_cmd}"
+    sleep 5
     undefine_vm_cmd=${sshpass_cmd_prefix}" virsh undefine ${vm_name} --nvram"
     echo "${undefine_vm_cmd}"
     eval "${undefine_vm_cmd}"
