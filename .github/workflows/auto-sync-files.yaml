@@ -4,7 +4,9 @@ on:
   # At 00:00 on day-of-month 20.
   schedule:
     - cron: '10 * * * *'
+  sync-files
     - cron: '40 * * * *'
+
 jobs:
   echo-name:
     runs-on: ubuntu-latest
