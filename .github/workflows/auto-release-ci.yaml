@@ -5,6 +5,7 @@ on:
   schedule:
     # excute everyday on 17:00 American time
     - cron: '35 * * * *'
+
 jobs:
   get-spray-ref:
     runs-on: [self-hosted]
