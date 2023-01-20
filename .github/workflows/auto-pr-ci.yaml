@@ -51,6 +51,10 @@ jobs:
           # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
           version: v1.46.2
           args: --timeout=10m
+      - name: rebase check
+        run: |
+          result=$(git rebase origin/main)
+          echo "rebase result is: $result"
 
   unit-test:
     needs: [ static-check,get_ref ]
