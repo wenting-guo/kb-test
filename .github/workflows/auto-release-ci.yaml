@@ -1,13 +1,13 @@
 name: Auto Release CI
 
 on:
+  workflow_dispatch:
   schedule:
     # excute everyday on 17:00 American time
-    - cron: '0 17 * * *'
-
+    - cron: '35 * * * *'
 jobs:
   get-spray-ref:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted]
     steps:
       - name: say-hello
         run: echo "hello word"
