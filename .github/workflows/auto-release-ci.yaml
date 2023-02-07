@@ -7,7 +7,7 @@ on:
     - cron: '35 * * * *'
 jobs:
   get-spray-ref:
-    runs-on: [self-hosted]
+    runs-on: ubuntu-latest
     steps:
       - name: say-hello
         run: echo "hello word"
